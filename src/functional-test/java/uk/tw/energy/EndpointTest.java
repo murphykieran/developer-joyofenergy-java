@@ -64,6 +64,21 @@ public class EndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    @Test
+    public void givenMeterIdShouldReturnCostOfPriorWeekUsage() throws Exception {
+
+        // given
+        String smartMeterId = "meterId";
+        populateMeterReadingsForMeter(smartMeterId);
+
+        // when
+        ResponseEntity<String> response =
+                restTemplate.getForEntity("/cost/" + smartMeterId, String.class);
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); // TODO - continue once this is passing
+    }
+
     private HttpEntity<String> getStringHttpEntity(Object object) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
