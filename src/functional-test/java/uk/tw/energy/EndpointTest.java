@@ -76,7 +76,7 @@ public class EndpointTest {
                 restTemplate.getForEntity("/cost/" + smartMeterId, String.class);
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); // TODO - continue once this is passing
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     private HttpEntity<String> getStringHttpEntity(Object object) throws JsonProcessingException {
