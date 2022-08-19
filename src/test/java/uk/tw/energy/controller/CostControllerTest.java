@@ -11,10 +11,7 @@ import uk.tw.energy.service.PricePlanService;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -37,19 +34,18 @@ public class CostControllerTest {
     public void shouldReturnCostForReadingsWithOnePricePlan() {
 
         // given
-        AccountService accountService = mock(AccountService.class);
         String meterId = "meter-id";
         String planId = "plan-id";
-        when(accountService.getPricePlanIdForSmartMeterId(meterId)).thenReturn(planId);
-        ElectricityReading firstReading = new ElectricityReading(Instant.MIN, BigDecimal.ONE);
-        ElectricityReading secondReading = new ElectricityReading(Instant.MIN.plusSeconds(3600), BigDecimal.ONE);
-        List<ElectricityReading> readings = Arrays.asList(firstReading, secondReading);
-        Map<String, List<ElectricityReading>> readingsByMeterId = Collections.singletonMap(meterId, readings);
-        MeterReadingService meterReadingService = new MeterReadingService(readingsByMeterId);
+        BigDecimal expectedConsumptionCost = BigDecimal.ONE;
 
-        PricePlan pricePlanForMySmartMeter = new PricePlan(planId, "My Supplier", BigDecimal.ONE, Collections.EMPTY_LIST);
-        List<PricePlan> pricePlans = Collections.singletonList(pricePlanForMySmartMeter);
-        PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingService);
+        Map<String, BigDecimal> consumptionCostOfElectricityReadingsForEachPricePlan =
+                Collections.singletonMap(planId, expectedConsumptionCost);
+
+        AccountService accountService = mock(AccountService.class);
+        PricePlanService pricePlanService = mock(PricePlanService.class);
+
+        when(accountService.getPricePlanIdForSmartMeterId(meterId)).thenReturn(planId);
+        when(pricePlanService.getConsumptionCostOfElectricityReadingsForEachPricePlan(meterId)).thenReturn(Optional.of(consumptionCostOfElectricityReadingsForEachPricePlan));
 
         CostController costController = new CostController(accountService, pricePlanService);
 
