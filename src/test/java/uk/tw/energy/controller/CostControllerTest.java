@@ -14,8 +14,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CostControllerTest {
     @Test
@@ -56,5 +55,8 @@ public class CostControllerTest {
         // then
         UsageCost actualUsageCost = (UsageCost) response.getBody();
         assertEquals(expectedConsumptionCost, actualUsageCost.getCost());
+
+        verify(accountService).getPricePlanIdForSmartMeterId(meterId);
+        verify(pricePlanService).getConsumptionCostOfElectricityReadingsForEachPricePlan(meterId);
     }
 }
