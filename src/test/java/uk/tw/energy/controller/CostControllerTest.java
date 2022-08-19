@@ -45,7 +45,8 @@ public class CostControllerTest {
         PricePlanService pricePlanService = mock(PricePlanService.class);
 
         when(accountService.getPricePlanIdForSmartMeterId(meterId)).thenReturn(planId);
-        when(pricePlanService.getConsumptionCostOfElectricityReadingsForEachPricePlan(meterId)).thenReturn(Optional.of(consumptionCostOfElectricityReadingsForEachPricePlan));
+        when(pricePlanService.getConsumptionCostOfElectricityReadingsForEachPricePlan(meterId))
+                .thenReturn(Optional.of(consumptionCostOfElectricityReadingsForEachPricePlan));
 
         CostController costController = new CostController(accountService, pricePlanService);
 
