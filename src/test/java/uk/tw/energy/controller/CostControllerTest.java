@@ -1,20 +1,19 @@
 package uk.tw.energy.controller;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
+import uk.tw.energy.domain.UsageCost;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CostControllerTest {
     @Test
     public void shouldReturnNoCostWhenNoReadingsExist() {
-        // Given
-        // Add smart meter
-        // Instantiate controller
+        CostController costController = new CostController();
 
-        // When
-        // call controller
+        ResponseEntity response = costController.getCost("TEST-SMART-METER");
 
-        // Then
-        // assert cost = 0
+        UsageCost actualCost = (UsageCost) response.getBody();
+        assertEquals(0, actualCost.getCost());
     }
 }
