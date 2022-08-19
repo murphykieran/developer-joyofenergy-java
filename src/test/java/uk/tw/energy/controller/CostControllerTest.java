@@ -55,6 +55,6 @@ public class CostControllerTest {
 
         // then
         UsageCost actualUsageCost = (UsageCost) response.getBody();
-        assertEquals(BigDecimal.ONE, actualUsageCost.getCost());
+        assertEquals(expectedConsumptionCost, actualUsageCost.getCost());
     }
 }
