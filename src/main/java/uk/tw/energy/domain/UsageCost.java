@@ -4,6 +4,6 @@ import java.math.BigDecimal;
 
 public class UsageCost {
     public BigDecimal getCost() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return BigDecimal.ZERO;
     }
 }
