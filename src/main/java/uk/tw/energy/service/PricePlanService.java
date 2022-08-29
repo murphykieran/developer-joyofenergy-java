@@ -7,6 +7,7 @@ import uk.tw.energy.domain.PricePlan;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,10 @@ public class PricePlanService {
 
         return Optional.of(pricePlans.stream().collect(
                 Collectors.toMap(PricePlan::getPlanName, t -> calculateCost(electricityReadings.get(), t))));
+    }
+
+    public BigDecimal getConsumptionCostForDateRange(String meterId, String planId, LocalDate startDate) {
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     private BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {

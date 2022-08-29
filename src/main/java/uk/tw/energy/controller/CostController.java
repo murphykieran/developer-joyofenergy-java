@@ -7,12 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.tw.energy.domain.UsageCost;
 import uk.tw.energy.service.AccountService;
-import uk.tw.energy.service.MeterReadingService;
 import uk.tw.energy.service.PricePlanService;
 
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/cost/{smartMeterId}")
@@ -28,15 +26,11 @@ public class CostController {
 
     @GetMapping("")
     public ResponseEntity getCost(@PathVariable String smartMeterId) {
+
+        LocalDate startDate = LocalDate.now().minusWeeks(1L);
         String pricePlanId = accountService.getPricePlanIdForSmartMeterId(smartMeterId);
-        Optional<Map<String, BigDecimal>> consumptionCostPerPricePlan = pricePlanService.getConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
-        if (consumptionCostPerPricePlan.isPresent()) {
-            BigDecimal consumptionCost = consumptionCostPerPricePlan.get().get(pricePlanId);
-            UsageCost usageCost = new UsageCost(consumptionCost);
-            return ResponseEntity.ok(usageCost);
-        }
-        else {
-            return ResponseEntity.ok(new UsageCost(BigDecimal.ZERO));
-        }
+        BigDecimal consumptionCost = pricePlanService.getConsumptionCostForDateRange(smartMeterId, pricePlanId, startDate);
+        UsageCost usageCost = new UsageCost(consumptionCost);
+        return ResponseEntity.ok(usageCost);
     }
 }
