@@ -30,10 +30,6 @@ class PricePlanServiceTest {
         String meterId = "myMeter";
         String planId = "myPlan";
 
-        LocalDateTime currentDateTime = LocalDateTime.of(2021, 12, 15, 1, 1, 1);
-        LocalDateTimeFactory localDateTimeFactory = mock(LocalDateTimeFactory.class);
-        when(localDateTimeFactory.now()).thenReturn(currentDateTime);
-
         LocalDateTime meterReadingDateTime = LocalDateTime.of(2021, 12, 1, 1, 1);
         Instant meterReadingInstant = Instant.ofEpochSecond(meterReadingDateTime.toEpochSecond(ZoneOffset.ofHours(0)));
 
@@ -45,7 +41,7 @@ class PricePlanServiceTest {
         MeterReadingService meterReadingService = mock(MeterReadingService.class);
         when(meterReadingService.getReadings(meterId)).thenReturn(Optional.of(Collections.singletonList(electricityReading)));
 
-        PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingService, localDateTimeFactory);
+        PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingService);
 
         // when
         BigDecimal actualConsumptionCostSince = pricePlanService.getConsumptionCostSince(startDate, meterId, planId);

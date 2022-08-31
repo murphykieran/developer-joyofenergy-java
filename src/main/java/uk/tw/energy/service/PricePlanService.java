@@ -6,10 +6,7 @@ import uk.tw.energy.domain.PricePlan;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +18,10 @@ public class PricePlanService {
 
     private final List<PricePlan> pricePlans;
     private final MeterReadingService meterReadingService;
-    private final LocalDateTimeFactory localDateTimeFactory;
 
     public PricePlanService(List<PricePlan> pricePlans, MeterReadingService meterReadingService) {
-        this(pricePlans, meterReadingService, new LocalDateTimeFactory());
-    }
-
-    public PricePlanService(List<PricePlan> pricePlans, MeterReadingService meterReadingService, LocalDateTimeFactory localDateTimeFactory) {
         this.pricePlans = pricePlans;
         this.meterReadingService = meterReadingService;
-        this.localDateTimeFactory = localDateTimeFactory;
     }
 
     public Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(String smartMeterId) {
@@ -46,22 +37,25 @@ public class PricePlanService {
 
     public BigDecimal getConsumptionCostSince(LocalDate startDate, String meterId, String planId) {
 
-        final LocalDateTime now = this.localDateTimeFactory.now();
         LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.of(0, 0,0));
-        Optional<List<ElectricityReading>> electricityReadings = meterReadingService.getReadings(meterId);
+        Instant startDateTimeInstant = startDateTime.toInstant(ZoneOffset.UTC);
 
+        Optional<List<ElectricityReading>> electricityReadings = meterReadingService.getReadings(meterId);
         Optional<PricePlan> pricePlan = this.pricePlans.stream().filter((PricePlan plan) -> { return plan.getPlanName().equals(planId); }).findFirst();
 
         if (electricityReadings.isPresent() && pricePlan.isPresent()) {
-            electricityReadings.get().stream().filter((ElectricityReading reading) -> {
-                LocalDateTime readingTime = LocalDateTime.from(reading.getTime());
-                return readingTime.isAfter(startDateTime);
+            List<ElectricityReading> readingsAfterStartDate = electricityReadings.get().stream().filter((ElectricityReading reading) -> {
+                return reading.getTime().isAfter(startDateTimeInstant);
             }).collect(Collectors.toList());
 
-            return calculateCost(electricityReadings.get(), pricePlan.get());
+            if (readingsAfterStartDate.isEmpty()) {
+                return BigDecimal.ZERO;
+            }
+
+            return calculateCost(readingsAfterStartDate, pricePlan.get());
         }
 
-        return BigDecimal.ZERO;
+        throw new UnsupportedOperationException("no electricity readings or no price plan - not handled yet!!");
     }
 
     private BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {
