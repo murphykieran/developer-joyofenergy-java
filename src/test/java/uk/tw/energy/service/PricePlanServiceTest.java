@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +28,6 @@ class PricePlanServiceTest {
 
         PricePlan pricePlan = mock(PricePlan.class);
         when(pricePlan.getPlanName()).thenReturn(planId);
-
         List<PricePlan> pricePlans = Collections.singletonList(pricePlan);
         MeterReadingService meterReadingService = mock(MeterReadingService.class);
 
@@ -44,6 +43,10 @@ class PricePlanServiceTest {
 
     @Test
     public void shouldReturnCostForInRangeMeterReadings() {
+
+//        TODO - for reference, example doing date math with the Instant class
+//        Instant oneWeekAgo = Instant.now().minus(1, ChronoUnit.WEEKS);
+
         BigDecimal expectedCost = BigDecimal.valueOf(5000L);
         LocalDate startDate = LocalDate.now().minusDays(1);
 
