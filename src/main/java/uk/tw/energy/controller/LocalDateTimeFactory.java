@@ -1,10 +1,10 @@
-package uk.tw.energy.service;
+package uk.tw.energy.controller;
 
 import java.time.LocalDateTime;
 
 class LocalDateTimeFactory {
 
     public LocalDateTime now() {
-        throw new UnsupportedOperationException("not implemented yet");
+        return LocalDateTime.now();
     }
 }

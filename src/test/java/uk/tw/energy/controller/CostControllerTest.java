@@ -8,8 +8,9 @@ import uk.tw.energy.service.PricePlanService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class CostControllerTest {
@@ -38,18 +39,19 @@ public class CostControllerTest {
         String meterId = "meter-id";
         String planId = "plan-id";
         BigDecimal expectedConsumptionCost = BigDecimal.ONE;
-        LocalDate startDate = LocalDate.now().minusWeeks(1L);
 
-        BigDecimal consumptionCostForDateRange = expectedConsumptionCost;
+        LocalDateTimeFactory localDateTimeFactory = mock(LocalDateTimeFactory.class);
+        LocalDateTime now = LocalDateTime.of(2022, 1, 15, 15, 5, 10);
+        when(localDateTimeFactory.now()).thenReturn(now);
 
         AccountService accountService = mock(AccountService.class);
         PricePlanService pricePlanService = mock(PricePlanService.class);
 
         when(accountService.getPricePlanIdForSmartMeterId(meterId)).thenReturn(planId);
-        when(pricePlanService.getConsumptionCostSince(startDate, meterId, planId))
-                .thenReturn(consumptionCostForDateRange);
+        when(pricePlanService.getConsumptionCostSince(now.toLocalDate(), meterId, planId))
+                .thenReturn(expectedConsumptionCost);
 
-        CostController costController = new CostController(accountService, pricePlanService);
+        CostController costController = new CostController(accountService, pricePlanService, localDateTimeFactory);
 
         // when
         ResponseEntity response = costController.getCost(meterId);

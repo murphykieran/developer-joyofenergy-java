@@ -1,5 +1,6 @@
 package uk.tw.energy.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,18 +17,25 @@ import java.time.LocalDate;
 @RequestMapping("/cost/{smartMeterId}")
 public class CostController {
 
-    private AccountService accountService;
-    private PricePlanService pricePlanService;
+    private final AccountService accountService;
+    private final PricePlanService pricePlanService;
+    private final LocalDateTimeFactory localDateTimeFactory;
 
+    @Autowired
     public CostController(AccountService accountService, PricePlanService pricePlanService) {
+        this(accountService, pricePlanService, new LocalDateTimeFactory());
+    }
+
+    CostController(AccountService accountService, PricePlanService pricePlanService, LocalDateTimeFactory localDateTimeFactory) {
         this.accountService = accountService;
         this.pricePlanService = pricePlanService;
+        this.localDateTimeFactory = localDateTimeFactory;
     }
 
     @GetMapping("")
     public ResponseEntity getCost(@PathVariable String smartMeterId) {
 
-        LocalDate startDate = LocalDate.now().minusWeeks(1L);
+        LocalDate startDate = this.localDateTimeFactory.now().toLocalDate();
         String pricePlanId = accountService.getPricePlanIdForSmartMeterId(smartMeterId);
         BigDecimal consumptionCost = pricePlanService.getConsumptionCostSince(startDate, smartMeterId, pricePlanId);
         UsageCost usageCost = new UsageCost(consumptionCost);
