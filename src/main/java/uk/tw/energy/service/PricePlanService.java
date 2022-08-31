@@ -37,7 +37,7 @@ public class PricePlanService {
     }
 
     public BigDecimal getConsumptionCostSince(LocalDate startDate, String meterId, String planId) {
-        throw new UnsupportedOperationException("not implemented yet");
+        return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {
