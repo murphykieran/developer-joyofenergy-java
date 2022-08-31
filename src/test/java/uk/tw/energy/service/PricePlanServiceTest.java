@@ -1,5 +1,6 @@
 package uk.tw.energy.service;
 
+import jdk.vm.ci.meta.Local;
 import org.junit.jupiter.api.Test;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
@@ -7,6 +8,9 @@ import uk.tw.energy.domain.PricePlan;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.chrono.ChronoLocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,16 +26,26 @@ class PricePlanServiceTest {
     public void startDateInFutureGetsUsageCostZero() {
 
         // given
-        LocalDate startDate = LocalDate.now().plusWeeks(1);
+        LocalDate startDate = LocalDate.of(2022, 1, 1);
         String meterId = "myMeter";
         String planId = "myPlan";
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2021, 12, 15, 1, 1, 1);
+        LocalDateTimeFactory localDateTimeFactory = mock(LocalDateTimeFactory.class);
+        when(localDateTimeFactory.now()).thenReturn(currentDateTime);
+
+        LocalDateTime meterReadingDateTime = LocalDateTime.of(2021, 12, 1, 1, 1);
+        Instant meterReadingInstant = Instant.ofEpochSecond(meterReadingDateTime.toEpochSecond(ZoneOffset.ofHours(0)));
 
         PricePlan pricePlan = mock(PricePlan.class);
         when(pricePlan.getPlanName()).thenReturn(planId);
         List<PricePlan> pricePlans = Collections.singletonList(pricePlan);
-        MeterReadingService meterReadingService = mock(MeterReadingService.class);
 
-        PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingService);
+        ElectricityReading electricityReading = new ElectricityReading(meterReadingInstant, BigDecimal.ONE);
+        MeterReadingService meterReadingService = mock(MeterReadingService.class);
+        when(meterReadingService.getReadings(meterId)).thenReturn(Optional.of(Collections.singletonList(electricityReading)));
+
+        PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingService, localDateTimeFactory);
 
         // when
         BigDecimal actualConsumptionCostSince = pricePlanService.getConsumptionCostSince(startDate, meterId, planId);
