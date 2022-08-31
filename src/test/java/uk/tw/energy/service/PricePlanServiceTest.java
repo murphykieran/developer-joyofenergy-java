@@ -44,18 +44,22 @@ class PricePlanServiceTest {
 
     @Test
     public void shouldReturnCostForInRangeMeterReadings() {
-        BigDecimal expectedCost = BigDecimal.TEN;
+        BigDecimal expectedCost = BigDecimal.valueOf(5000L);
         LocalDate startDate = LocalDate.now().minusDays(1);
+
         PricePlan pricePlan = mock(PricePlan.class);
         when(pricePlan.getPlanName()).thenReturn("PLAN-ID");
+        when(pricePlan.getUnitRate()).thenReturn(BigDecimal.ONE);
+
         List<PricePlan> pricePlans = Collections.singletonList(pricePlan);
-        when(pricePlan.getUnitRate()).thenReturn(expectedCost);
+
         MeterReadingService meterReadingService = mock(MeterReadingService.class);
         int twoDaysAgo = 60 * 60 * 24 * 2;
-        ElectricityReading outOfRangeReading = new ElectricityReading(Instant.now().minusSeconds(twoDaysAgo), BigDecimal.ONE);
-        ElectricityReading inRangeReading = new ElectricityReading(Instant.now().minusSeconds(1), BigDecimal.ONE);
+        ElectricityReading outOfRangeReading = new ElectricityReading(Instant.now().minusSeconds(twoDaysAgo), BigDecimal.valueOf(1000L));
+        ElectricityReading inRangeReading = new ElectricityReading(Instant.now().minusSeconds(1), BigDecimal.valueOf(5000L));
         List<ElectricityReading> readings = Arrays.asList(outOfRangeReading, inRangeReading);
         when(meterReadingService.getReadings("METER-ID")).thenReturn(Optional.of(readings));
+
         PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingService);
 
         BigDecimal actualCost = pricePlanService.getConsumptionCostSince(startDate, "METER-ID", "PLAN-ID");

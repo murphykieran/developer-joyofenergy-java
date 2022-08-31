@@ -37,7 +37,17 @@ public class PricePlanService {
     }
 
     public BigDecimal getConsumptionCostSince(LocalDate startDate, String meterId, String planId) {
-        return BigDecimal.ZERO;
+
+        Optional<List<ElectricityReading>> electricityReadings = meterReadingService.getReadings(meterId);
+
+        PricePlan pricePlan = null;
+        for (PricePlan plan : pricePlans) {
+            if (plan.getPlanName().equals(planId)) {
+                pricePlan = plan;
+            }
+        }
+
+        return calculateCost(electricityReadings.get(), pricePlan);
     }
 
     private BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {
