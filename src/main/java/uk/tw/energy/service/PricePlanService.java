@@ -36,7 +36,7 @@ public class PricePlanService {
                 Collectors.toMap(PricePlan::getPlanName, t -> calculateCost(electricityReadings.get(), t))));
     }
 
-    public BigDecimal getConsumptionCostForDateRange(String meterId, String planId, LocalDate startDate) {
+    public BigDecimal getConsumptionCostSince(LocalDate startDate, String meterId, String planId) {
         throw new UnsupportedOperationException("not implemented yet");
     }
 

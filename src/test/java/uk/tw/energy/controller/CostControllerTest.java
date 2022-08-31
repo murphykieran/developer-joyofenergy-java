@@ -22,7 +22,7 @@ public class CostControllerTest {
         CostController costController = new CostController(accountService, pricePlanService);
 
         when(accountService.getPricePlanIdForSmartMeterId(any(String.class))).thenReturn("PLAN-ID");
-        when(pricePlanService.getConsumptionCostForDateRange(any(String.class), any(String.class), any(LocalDate.class)))
+        when(pricePlanService.getConsumptionCostSince(any(LocalDate.class), any(String.class), any(String.class)))
                 .thenReturn(BigDecimal.ZERO);
 
         ResponseEntity response = costController.getCost("TEST-SMART-METER");
@@ -46,7 +46,7 @@ public class CostControllerTest {
         PricePlanService pricePlanService = mock(PricePlanService.class);
 
         when(accountService.getPricePlanIdForSmartMeterId(meterId)).thenReturn(planId);
-        when(pricePlanService.getConsumptionCostForDateRange(meterId, planId, startDate))
+        when(pricePlanService.getConsumptionCostSince(startDate, meterId, planId))
                 .thenReturn(consumptionCostForDateRange);
 
         CostController costController = new CostController(accountService, pricePlanService);

@@ -29,7 +29,7 @@ public class CostController {
 
         LocalDate startDate = LocalDate.now().minusWeeks(1L);
         String pricePlanId = accountService.getPricePlanIdForSmartMeterId(smartMeterId);
-        BigDecimal consumptionCost = pricePlanService.getConsumptionCostForDateRange(smartMeterId, pricePlanId, startDate);
+        BigDecimal consumptionCost = pricePlanService.getConsumptionCostSince(startDate, smartMeterId, pricePlanId);
         UsageCost usageCost = new UsageCost(consumptionCost);
         return ResponseEntity.ok(usageCost);
     }
