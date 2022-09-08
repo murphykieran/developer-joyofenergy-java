@@ -8,10 +8,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.ZoneOffset;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +37,10 @@ public class PricePlanService {
     public BigDecimal getConsumptionCostSince(LocalDate startDate, String meterId, String planId) {
 
         Optional<List<ElectricityReading>> electricityReadings = meterReadingService.getReadings(meterId);
+        List<ElectricityReading> readingsForGivenRange = electricityReadings.orElseGet(Collections::emptyList)
+                .stream()
+                .filter((electricityReading) -> electricityReading.getTime().isAfter(startDate.atStartOfDay().toInstant(ZoneOffset.UTC)))
+                .collect(Collectors.toList());
 
         PricePlan pricePlan = null;
         for (PricePlan plan : pricePlans) {
@@ -47,7 +49,7 @@ public class PricePlanService {
             }
         }
 
-        return calculateCost(electricityReadings.get(), pricePlan);
+        return calculateCost(readingsForGivenRange, pricePlan);
     }
 
     private BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {

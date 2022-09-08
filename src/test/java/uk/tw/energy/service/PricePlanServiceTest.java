@@ -7,6 +7,7 @@ import uk.tw.energy.domain.PricePlan;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -45,10 +46,14 @@ class PricePlanServiceTest {
     public void shouldReturnCostForInRangeMeterReadings() {
 
 //        TODO - for reference, example doing date math with the Instant class
-//        Instant oneWeekAgo = Instant.now().minus(1, ChronoUnit.WEEKS);
+        Instant now = Instant.now();
+        LocalDate startDate = LocalDate.now().minusDays(3);
+        Instant oneWeekAgo = now.minus(7, ChronoUnit.DAYS);
+        Instant twoDaysAgo = now.minus(2, ChronoUnit.DAYS);
+        Instant oneDaysAgo = now.minus(1, ChronoUnit.DAYS);
 
-        BigDecimal expectedCost = BigDecimal.valueOf(5000L);
-        LocalDate startDate = LocalDate.now().minusDays(1);
+        BigDecimal expectedCost = BigDecimal.valueOf(10800L);
+
 
         PricePlan pricePlan = mock(PricePlan.class);
         when(pricePlan.getPlanName()).thenReturn("PLAN-ID");
@@ -57,10 +62,11 @@ class PricePlanServiceTest {
         List<PricePlan> pricePlans = Collections.singletonList(pricePlan);
 
         MeterReadingService meterReadingService = mock(MeterReadingService.class);
-        int twoDaysAgo = 60 * 60 * 24 * 2;
-        ElectricityReading outOfRangeReading = new ElectricityReading(Instant.now().minusSeconds(twoDaysAgo), BigDecimal.valueOf(1000L));
-        ElectricityReading inRangeReading = new ElectricityReading(Instant.now().minusSeconds(1), BigDecimal.valueOf(5000L));
-        List<ElectricityReading> readings = Arrays.asList(outOfRangeReading, inRangeReading);
+
+        ElectricityReading outOfRangeReading = new ElectricityReading(oneWeekAgo, BigDecimal.valueOf(1000L));
+        ElectricityReading inRangeReading1 = new ElectricityReading(oneDaysAgo, BigDecimal.valueOf(100L));
+        ElectricityReading inRangeReading2 = new ElectricityReading(twoDaysAgo, BigDecimal.valueOf(200L));
+        List<ElectricityReading> readings = Arrays.asList(outOfRangeReading, inRangeReading1, inRangeReading2);
         when(meterReadingService.getReadings("METER-ID")).thenReturn(Optional.of(readings));
 
         PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingService);
